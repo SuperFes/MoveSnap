@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Snappy Move Script
+Comment=Script helps organize the windows on your desktop by snapping windows in the middle of each screen, and cascading window snapping.
+Icon=preferences-system-windows
+
+X-KDE-PluginInfo-Author=Aaron Nixon
+X-KDE-PluginInfo-Email=kdedoom@cookiedoom.com
+X-KDE-PluginInfo-Name=MoveSnap
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-License=GPL
+
+Type=Service
+X-KDE-ServiceTypes=KWin/Script
+X-Plasma-API=javascript
+X-Plasma-MainScript=code/main.js
