@@ -22,7 +22,39 @@ for (var s = 0; s < workspace.numScreens; s++) {
     widths += Screen.width;
 }
 
+function GetDistance(point, rect) {
+    let dx = point.left - rect.left;
+    let dy = point.top - rect.top;
+
+    let d = Math.sqrt(dx * dx + dy * dy);
+
+    if (d <= 30) {
+        return {left: dx, top: dy};
+    }
+
+    return false;
+}
+
+function NearQuad(quad, rect) {
+    let Bleh =
+        GetDistance(quad.TL, rect) ||
+        GetDistance(quad.TR, rect) ||
+        GetDistance(quad.BR, rect) ||
+        GetDistance(quad.BL, rect);
+
+    return Bleh;
+}
+
 function MoveResized(client, rect) {
+    let Frame = client.frameGeometry;
+
+    let Quad = {
+        TL: {left: Frame.left - 30, top: Frame.top - 30},
+        TR: {left: Frame.left + 30, top: Frame.top - 30},
+        BR: {left: Frame.left + 30, top: Frame.top + 30},
+        BL: {left: Frame.left - 30, top: Frame.top + 30}
+    };
+
     if (client.screen < workspace.numScreens) {
         for (let s = 0; s < workspace.numScreens; s++) {
             let fromRight = centerFences[s] - rect.right;
@@ -69,39 +101,19 @@ function MoveResized(client, rect) {
             continue;
         }
 
-        let fromRight = rect.left - (cClient.frameGeometry.left + 30);
-        let fromTop   = rect.top - (cClient.frameGeometry.top + 30);
+        let Point = NearQuad(Quad, cClient.frameGeometry);
 
-        if (fromRight < -15 || fromRight > 15 || fromTop < -15 || fromTop > 15) {
-            let fromRight = (cClient.frameGeometry.left - 30) - rect.left;
-            let fromTop   = (cClient.frameGeometry.top - 30) - rect.top;
-
-            if (fromRight < -15 || fromRight > 15 || fromTop < -15 || fromTop > 15) {
-                continue;
-            }
-
-            rect.x += fromRight;
-            rect.left += fromRight;
-            rect.right += fromRight;
-
-            rect.y += fromTop;
-            rect.top += fromTop;
-            rect.bottom += fromTop;
-
-            client.frameGeometry = rect;
-
-            workspace.showOutline(rect);
-
-            return;
+        if (!Point) {
+            continue;
         }
 
-        rect.x -= fromRight;
-        rect.left -= fromRight;
-        rect.right -= fromRight;
+        rect.x -= Point.left;
+        rect.left -= Point.left;
+        rect.right -= Point.left;
 
-        rect.y -= fromTop;
-        rect.top -= fromTop;
-        rect.bottom -= fromTop;
+        rect.y -= Point.top;
+        rect.top -= Point.top;
+        rect.bottom -= Point.top;
 
         client.frameGeometry = rect;
 
