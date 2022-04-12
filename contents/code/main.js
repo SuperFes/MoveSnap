@@ -11,15 +11,19 @@ const clients = workspace.clientList();
 var clientBorders = [];
 var centerFences = [];
 
-let widths = 0;
+function CalculateScreens(Screens) {
+    centerFences.splice(0);
 
-for (var s = 0; s < workspace.numScreens; s++) {
-    let Screen = workspace.clientArea({}, s, 0);
-    let Fence = widths + Math.floor(Screen.width / 2);
+    let widths = 0;
 
-    centerFences[s] = Fence;
+    for (let s = 0; s < Screens; s++) {
+        let Screen = workspace.clientArea({}, s, 0);
+        let Fence = widths + Math.floor(Screen.width / 2);
 
-    widths += Screen.width;
+        centerFences.push(Fence);
+
+        widths += Screen.width;
+    }
 }
 
 function GetDistance(point, rect) {
@@ -55,10 +59,11 @@ function MoveResized(client, rect) {
         BL: {left: Frame.left - 30, top: Frame.top + 30}
     };
 
-    if (client.screen < workspace.numScreens) {
-        for (let s = 0; s < workspace.numScreens; s++) {
-            let fromRight = centerFences[s] - rect.right;
-            let fromLeft = rect.left - centerFences[s];
+    if (client.screen <= centerFences.length) {
+        for (let s = 0; s < centerFences.length; s++) {
+            let fromRight  = centerFences[s] - rect.right;
+            let fromLeft   = rect.left - centerFences[s];
+            let fromCenter = (rect.left + Math.round(rect.width / 2)) - centerFences[s];
 
             if (fromRight < 15 && fromRight > 0) {
                 rect.x += fromRight;
@@ -75,6 +80,17 @@ function MoveResized(client, rect) {
                 rect.x -= fromLeft;
                 rect.left -= fromLeft;
                 rect.right -= fromLeft;
+
+                client.frameGeometry = rect;
+
+                workspace.showOutline(rect);
+
+                return;
+            }
+            else if (fromCenter < 15 && fromCenter > -15) {
+                rect.x -= fromCenter;
+                rect.left -= fromCenter;
+                rect.right -= fromCenter;
 
                 client.frameGeometry = rect;
 
@@ -159,13 +175,6 @@ workspace.clientRemoved.connect(function(client) {
     }
 });
 
-workspace.numberScreensChanged.connect(function (count) {
-    for (var s = 0; s < workspace.numScreens; s++) {
-        let Screen = workspace.clientArea({}, s, 0);
-        let Fence = widths + Math.floor(Screen.width / 2);
+workspace.numberScreensChanged.connect(CalculateScreens);
 
-        centerFences[s] = Fence;
-
-        widths += Screen.width;
-    }
-});
+CalculateScreens(workspace.numScreens);
