@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Name": "Snappy Move Script",
+        "Description": "Script helps organize the windows on your desktop by snapping windows in the middle of each screen, and cascading window snapping.",
+        "Icon": "preferences-system-windows",
+
+        "Authors": [
+            {
+            "Email": "aarondoom@cookiedoom.com",
+            "Name": "Aaron Nixon"
+        }
+        ],
+        "Id": "MoveSnap",
+        "Version": "1.4",
+        "License": "GPLv3",
+        "Website": "https://github.com/Superfes/MoveSnap"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}
